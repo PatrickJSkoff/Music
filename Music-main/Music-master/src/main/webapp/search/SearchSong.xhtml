@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<!-- This page is constructed based on the siteTemplate -->
+<ui:composition template="/template/siteTemplate.xhtml">
+   <ui:define name="title">
+      <!-- Set the page title -->
+      <h:outputText value="#{bundle.SearchSong}" />
+   </ui:define>
+
+   <!-- Create the content for this page below -->
+   <ui:define name="editableContent">
+
+      <div align="center">
+         <h1>#{bundle.SearchSong}</h1>
+         <h:form id="SearchBySongNameForm">
+            <br /><br />
+            <fieldset style="width: 50%">
+               <br /><br />
+               <span class="ui-outputlabel-label">#{bundle.EnterSongName}:</span>
+               <br /><br />
+               <p:inputText value="#{apiSearchBySongNameController.nameQuery}" style="width:40%"/>
+               <br /><br />
+               <br /><br />
+               <p:commandButton value="#{bundle.Search}" icon="fas fa-search" styleClass="rounded-button"
+                                action="#{apiSearchBySongNameController.performSearch(apiSearchBySongNameController.baseUrl)}" ajax="false">
+               </p:commandButton>
+               <br /><br />
+            </fieldset>
+         </h:form>
+      </div>
+   </ui:define>
+</ui:composition>
+</html>

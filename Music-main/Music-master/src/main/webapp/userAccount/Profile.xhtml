@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:c="jakarta.tags.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<!-- This page is constructed based on the siteTemplate -->
+<ui:composition template="/template/siteTemplate.xhtml">
+
+    <ui:define name="title">
+        <!-- Set the page title -->
+        <h:outputText value="#{bundle.MyAccount}"/>
+    </ui:define>
+
+    <!-- Create the content for this page below -->
+    <ui:define name="editableContent">
+        <c:if test="#{userController.userIsSignedIn() == true}">
+            <h:form id="UserProfileForm">
+                <!--
+                **********************
+                *       Sidebar      *
+                **********************
+                -->
+                <p:sidebar widgetVar="sidebar" position="left">
+                    <br/><br/><br/><br/>
+                    <div align="center">
+                        <h1>#{bundle.AccountSettings}</h1>
+                    </div>
+                    <br/>
+                    <div style="padding-left: 15%">
+                        <p:menu>
+                            <p:menuitem value="#{bundle.EditProfile}" action="#{userController.prepareForEdit()}"
+                                        ajax="false" icon="fas fa-edit"/>
+                            <p:menuitem value="#{bundle.ChangePhoto}" outcome="/userPhoto/ChangePhoto" icon="fas fa-camera"/>
+                            <p:menuitem value="#{bundle.ChangePassword}" outcome="/userPasswordChange/EnterUsername"
+                                        icon="fas fa-key"/>
+                            <p:menuitem value="#{bundle.DeleteAccount}" outcome="/userAccount/DeleteAccount"
+                                        icon="fas fa-trash-alt"/>
+                        </p:menu>
+                    </div>
+                    <br/>
+                    <div align="center">
+                        <!-- Two-Factor Authentication Status -->
+                        <c:if test="#{userController.signedInUser.twoFactorAuthenticationStatus == 1}">
+                            <span class="titleSmall">#{bundle.TwoFA}<br/>#{bundle.IsTurnedOn} Email</span>
+                        </c:if>
+                        <c:if test="#{userController.signedInUser.twoFactorAuthenticationStatus == 2}">
+                            <span class="titleSmall">#{bundle.TwoFA}<br/>#{bundle.IsTurnedOn} SMS</span>
+                        </c:if>
+                        <c:if test="#{userController.signedInUser.twoFactorAuthenticationStatus == 0}">
+                            <span class="titleSmall">#{bundle.TwoFA}<br/>#{bundle.IsTurnedOff}</span>
+                        </c:if>
+                    </div>
+                </p:sidebar>
+
+                <!--
+                **********************
+                *   User's Profile   *
+                **********************
+                -->
+                <div align="center">
+                    <h1> #{userController.signedInUser.firstName}&nbsp;#{userController.signedInUser.lastName}'s #{bundle.AccountProfile} </h1>
+                    <!--
+                    USER'S PROFILE PHOTO: Display the user's account profile photo in a circle.
+                    The cache="false" option enables immediate display of a newly uploaded photo without using cache.
+                    -->
+                    <p:graphicImage cache="false" styleClass="profilePhoto" value="#{userController.userPhoto()}"/>
+                    <br/><br/>
+                    <table border="1" align="center" cellpadding="5" cellspacing="0">
+                        <tbody>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.FirstName}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.firstName}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.MiddleName}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.middleName}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.LastName}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.lastName}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.AddressLine1}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.address1}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.AddressLine2}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.address2}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.City}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.city}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.StateName}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.stateName}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.ZipCode}"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.zipcode}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.Email}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.email}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.Username}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <h:outputText value="#{userController.signedInUser.username}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <h:outputText value="#{bundle.AccountSettings}:"/>
+                            </td>
+                            <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                                <p:commandButton value="#{bundle.Settings}" type="button" onclick="PF('sidebar').show()"
+                                                 icon="fas fa-cog" styleClass="ui-button-outlined"/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </h:form>
+        </c:if>
+        <c:if test="#{userController.userIsSignedIn() == false}">
+            <div align="center"><h1>Cybercriminal Activity is Detected and Rejected!</h1></div>
+        </c:if>
+    </ui:define>
+</ui:composition>
+</html>

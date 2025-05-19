@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+    <!--
+    =======================================================
+    Dialog Showing YouTube Player to Play the Video with ID
+    =======================================================
+    -->
+    <p:dialog id="VideoApiPlayDlg" header="#{bundle.PlayMusicVideo}" widgetVar="VideoApiPlayDialog"
+              modal="true" position="center" appendTo="@(body)" width="90%" style="max-width: 1000px;"
+              showEffect="slide" hideEffect="fade" responsive="true">
+
+        <h:form id="VideoApiPlayForm">
+            <div align="center">
+                <br />
+                <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%;">
+                    <iframe
+                            src="https://www.youtube.com/embed/#{apiSearchBySongNameController.youtubeVideoId}"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"
+                            allow="fullscreen">
+                    </iframe>
+                </div>
+                <br />
+                <p:commandButton value="Close" icon="fas fa-window-close" styleClass="ui-button-outlined"
+                                 onclick="PF('VideoApiPlayDialog').hide()" />
+            </div>
+        </h:form>
+    </p:dialog>
+
+
+</ui:composition>
+</html>
+
+
+
+
+
+

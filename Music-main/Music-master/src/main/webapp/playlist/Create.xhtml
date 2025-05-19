@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="jakarta.faces.core">
+
+<ui:composition>
+    <!--
+    ========================================================================
+    |  Clicking the CREATE button in DataTable.xhtml displays this Dialog  |
+    |  window for the user to enter the data to create a new park visit.      |
+    ========================================================================
+    -->
+    <p:dialog id="PlaylistCreateDlg" header="#{bundle.CreatePlaylist}" widgetVar="PlaylistCreateDialog"
+              modal="true" position="center" appendTo="@(body)" width="50%" height="400"
+              showEffect="slide" hideEffect="fade" responsive="true">
+        <!--
+        Various effect options can be used when showing and closing the dialog.
+        Use showEffect and hideEffect options to apply these effects:
+            blind, bounce, clip, drop, explode, fade, fold, highlight, puff,
+            pulsate, scale, shake, size, slide and transfer. [PrimeFaces Documentation]
+        -->
+
+        <!-- class="ui-datatable-data" in siteStyles reduces row paddings -->
+        <h:form id="PlaylistCreateForm" class="ui-datatable-data">
+            <h:panelGroup id="display">
+                <!--
+                When the user clicks the CREATE button in DataTable.xhtml, actionListener="#{playlistController.prepareCreate}"
+                executes the prepareCreate method in which a new Playlist object is instantiated and its object reference
+                is stored in the "selected" instance variable. Thus, "selected" points to a newly created Playlist object
+                with property (instance variable) values set to empty or null. The inputText data fields below are
+                intended to assign user-provided values to the properties of the newly created Playlist object.
+                -->
+                <table border="0" align="center" cellpadding="5" cellspacing="0">
+                    <tbody>
+                    <tr>
+                        <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                            <p:outputLabel value="#{bundle.PlaylistName}:" for="name"/>
+                        </td>
+                        <td align="left" valign="middle" bgcolor="oldlace" width="100%">
+                            <p:inputText id="name" value="#{playlistController.selected.name}" style="width:100%"
+                                         required="true" requiredMessage="#{bundle.PlaylistNameRequired}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                            <p:outputLabel value="#{bundle.PlaylistDescription}:" for="description"/>
+                        </td>
+                        <td align="left" valign="middle" bgcolor="oldlace" width="100%">
+                            <p:inputText id="description" value="#{playlistController.selected.description}" style="width:100%"
+                                         required="true" requiredMessage="#{bundle.PlaylistDescriptionRequired}"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </h:panelGroup>
+            <h:panelGroup>
+                <br/>
+                <div align="center">
+                    <!-- SAVE button -->
+                    <p:commandButton value="Save" icon="fas fa-save" styleClass="rounded-button"
+                                     ajax="false" actionListener="#{playlistController.create()}"
+                                     update="display,:PlaylistListForm:datalist,:growlInfoMessage,:growlWarningMessage,:growlErrorMessage,:growlFatalMessage"
+                                     oncomplete="handleSubmit(args,'PlaylistCreateDialog');"/>
+                    &nbsp;
+                    <!--
+                    CANCEL button: Call the cancel() method immediately without first rendering this Jakarta Faces page.
+                    The cancel() method will make the selected park visit object null and show the List page.
+                    -->
+                    <p:commandButton value="Cancel" icon="fas fa-ban" styleClass="ui-button-outlined"
+                                     action="#{playlistController.cancel()}" ajax="false" immediate="true"
+                                     onclick="PF('PlaylistCreateDialog').hide()"/>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

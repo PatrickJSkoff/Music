@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:c="jakarta.tags.core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <!--
+    *********************************************
+    * Header Component of Template siteTemplate *
+    *********************************************
+    This page's content is displayed on the top of each page created based on the siteTemplate.
+    Changes made in this file will show up automatically with all pages created based on the
+    siteTemplate for the entire site, achieving great maintainability.
+    -->
+
+    <!-- Do not enter tags before the composition line since they are ignored by JSF -->
+    <ui:composition>
+        <h:form>
+            <table border="0" cellspacing="0" cellpadding="10" width="100%">
+                <tr>
+                    <!--
+                    The widths of Column 1 and 3 must be set as fixed so that Column 2 can center its content.
+                    ************************************
+                    Column 1 (Left): Music Logo Image
+                    ************************************
+                    -->
+                    <td align="left" valign="middle" style="width:255px;">
+
+                        <!-- Use EL to reference the image file since it will be accessed from all UI pages -->
+                        <h:link outcome="/index">
+                            <img src="#{resource['images:MusicLogo.png']}"
+                                 style="height:80px; width:auto; float:left; padding-left:10px; border:none;"
+                                 alt="Music Logo" />
+                        </h:link>
+
+                    </td>
+                    <!--
+                    *******************************
+                    Column 2 (Center): Welcome User
+                    *******************************
+                    -->
+                    <td valign="middle" style="width:100%; text-align:center;">
+                        <div style="display: inline-block;">
+                            <c:if test="#{userController.userIsSignedIn()}">
+                                <span class="headerTitle">#{bundle.Greeting2}, #{userController.signedInUser.firstName}</span>
+                            </c:if>
+                            <c:if test="#{!userController.userIsSignedIn()}">
+                                <span class="headerTitle">#{bundle.Greeting1}</span>
+                            </c:if>
+                        </div>
+                    </td>
+                    <!--
+                    ***************************************
+                    Column 3 (Right): Hamburger Menu Button
+                    ***************************************
+                    -->
+                    <!--
+                    Constant column 3 width is required for the middle column to be able to center its content.
+                    Width 100 is for the menu button. Menu items are displayed as an overlay.
+                    style="white-space: nowrap;" prevents menu item name to wrap around.
+                    -->
+                    <td align="right" valign="middle" style="width:100px;">
+                        <div style="padding-right:10px">
+                            <p:commandButton id="dynaButton" value="#{bundle.Menu}" type="button" icon="pi pi-bars"/>
+                            <p:tieredMenu overlay="true" trigger="dynaButton" my="left top" at="left bottom" style="white-space: nowrap;">
+                                <p:menuitem value="#{bundle.Home}" outcome="/index" icon="fas fa-home"/>
+
+                                <p:submenu label="#{bundle.Search}" icon="fas fa-magnifying-glass">
+                                    <p:menuitem value="#{bundle.SearchArtist}" outcome="/search/SearchArtist" icon="fa-solid fa-microphone-lines"/>
+                                    <p:menuitem value="#{bundle.SearchSong}" outcome="/search/SearchSong" icon="fa-solid fa-music"/>
+                                    <p:menuitem value="#{bundle.SearchConcert}" outcome="/search/SearchConcert" icon="fa-solid fa-guitar"/>
+                                    <p:menuitem value="#{bundle.SearchAlbum}" outcome="/search/SearchAlbum" icon="fa-solid fa-compact-disc"/>
+                                </p:submenu>
+
+                                <!-- Menu Options IF a User is Signed In -->
+                                <c:if test="#{userController.userIsSignedIn() == true}">
+
+                                    <p:menuitem value="#{bundle.UserSongs}" outcome="/userSong/DataTable" icon="fa-solid fa-music" />
+                                    <p:menuitem value="#{bundle.UserArtists}" outcome="/userArtist/DataTable" icon="fa-solid fa-microphone-lines" />
+                                    <p:menuitem value="#{bundle.UserConcerts}" outcome="/userConcert/DataTable" icon="fa-solid fa-guitar" />
+
+                                    <p:menuitem value="#{bundle.UserPlaylists}" outcome="/playlist/DataTable" icon="fas fa-list" />
+
+                                    <p:menuitem value="#{bundle.SongQuiz}" action="#{songQuizController.startQuiz()}" icon="fas fa-clipboard" />
+
+                                    <p:menuitem outcome="/userAccount/Profile">
+                                        <p:graphicImage cache="false" styleClass="smallProfilePhoto" value="#{userController.userPhoto()}" />
+                                        &nbsp;#{bundle.MyAccount}
+                                    </p:menuitem>
+
+                                    <p:menuitem value="#{bundle.SignOut}" action="#{userController.logout()}" icon="fas fa-sign-out-alt" />
+                                </c:if>
+
+                                <!-- Menu Options IF No User is Signed In -->
+                                <c:if test="#{userController.userIsSignedIn() == false}">
+                                    <p:menuitem value="#{bundle.SignIn}" outcome="/signIn/SignIn" icon="fas fa-sign-in-alt" />
+                                    <p:menuitem value="#{bundle.CreateAccount}" outcome="/userAccount/CreateAccount" icon="fas fa-user-plus" />
+                                </c:if>
+
+                            </p:tieredMenu>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </h:form>
+    </ui:composition>
+    <!-- Do not enter tags before the composition line since they are ignored by JSF -->
+</html>

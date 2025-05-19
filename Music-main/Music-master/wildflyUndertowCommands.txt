@@ -1,0 +1,8 @@
+/subsystem=undertow/configuration=handler/file=MPhotosDirHandler/:add(cache-buffer-size=1024,cache-buffers=1024,directory-listing=false,follow-symlink=true,path=C:/Users/Alex/DocRoot/MusicStorage/PhotoStorage/)
+
+
+/subsystem=undertow/server=default-server/host=default-host/location=\/mphotos/:add(handler=MPhotosDirHandler)
+
+/subsystem=undertow/configuration=handler/file=MFilesDirHandler/:add(cache-buffer-size=1024,cache-buffers=1024,directory-listing=false,follow-symlink=true,path=C:/Users/Alex/DocRoot/MusicStorage/FileStorage/)
+
+/subsystem=undertow/server=default-server/host=default-host/location=\/mfiles/:add(handler=MFilesDirHandler)

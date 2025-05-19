@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core">
+
+    <!-- This page is constructed based on the siteTemplate -->
+    <ui:composition template="/template/siteTemplate.xhtml">
+        <ui:define name="title">
+            <!-- Set the page title -->
+            <h:outputText value="#{bundle.SongQuiz}" />
+        </ui:define>
+
+        <!-- Set 'selected' to null in userSongController if user closes the Edit dialogue-->
+        <c:if test="#{facesContext.validationFailed}">
+            ${userSongController.unselect()}
+        </c:if>
+
+        <!-- Set 'selected' to null in userSongController when the user refreshes / reloads this Jakarta Faces page -->
+        <f:metadata>
+            <f:viewAction action="#{userSongController.unselect()}" rendered="#{facesContext.postback}" />
+        </f:metadata>
+
+        <!-- Create the content for this page below -->
+        <ui:define name="editableContent">
+            <div align="center">
+                <h:form id="SongQuizForm">
+                    <h1>#{bundle.TakeSongQuiz}</h1>
+                    <p:panel style="text-align: center; width:80%;">
+                        <!-- Display random lyrics and Score -->
+                        <h:panelGroup layout="block" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+
+                            <h:outputText value="" style="flex: 1;" />
+
+                            <h:outputLabel value="#{songQuizController.randomLyrics}"
+                                           style="flex: 1; text-align: center; font-weight: bold; font-size: 1.2vw; color: #000000;" />
+
+                            <h:outputText value="#{bundle.Score}: #{songQuizController.score} / #{songQuizController.totalGuesses}"
+                                          style="flex: 1; text-align: right; font-weight: bold; font-size: 1.2vw; color: black; padding-right: 1.5vw;" />
+                        </h:panelGroup>
+                        <br/>
+                        <!-- Inputs for guessing song and artist -->
+                        <h:panelGrid columns="1" cellpadding="5" style="margin:auto;">
+                            <h:outputLabel for="songGuess" value="#{bundle.GuessSongLyrics}:" />
+
+                            <p:inputText id="songGuess"
+                                         value="#{songQuizController.songGuess}"
+                                         style="width: 400px;" />
+                            <br/>
+                            <h:outputLabel for="artistGuess" value="#{bundle.GuessArtistLyrics}:" />
+
+                            <p:inputText id="artistGuess"
+                                         value="#{songQuizController.artistGuess}"
+                                         style="width: 400px;" />
+                            <br/>
+                            <p:commandButton value="#{bundle.Submit}" icon="fas fa-check" styleClass="rounded-button"
+                                             update="SongQuizResultForm,:growlInfoMessage,:growlWarningMessage,:growlErrorMessage,:growlFatalMessage"
+                                             action="#{songQuizController.guessSong()}"/>
+                        </h:panelGrid>
+                    </p:panel>
+                    <br/><br/>
+                </h:form>
+            </div>
+        </ui:define>
+    </ui:composition>
+</html>

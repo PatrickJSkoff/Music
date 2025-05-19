@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  - Created by Osman Balci on 2025.2.7 and Benjamin Scoppa on 2025.5.6
+  - Copyright © 2025 Osman Balci. All rights reserved.
+  -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="jakarta.faces.core">
+
+<ui:composition>
+    <!--
+    ========================================================================
+    |  Clicking the CREATE button in DataTable.xhtml displays this Dialog  |
+    |  window for the user to enter the data to create a new park visit.      |
+    ========================================================================
+    -->
+    <p:dialog id="PlaylistSongAddDlg" header="#{bundle.AddSongToPlaylist}" widgetVar="PlaylistSongAddDialog"
+              modal="true" position="center" appendTo="@(body)" width="40%" height="200"
+              showEffect="slide" hideEffect="fade" responsive="true">
+        <!--
+        Various effect options can be used when showing and closing the dialog.
+        Use showEffect and hideEffect options to apply these effects:
+            blind, bounce, clip, drop, explode, fade, fold, highlight, puff,
+            pulsate, scale, shake, size, slide and transfer. [PrimeFaces Documentation]
+        -->
+
+        <!-- class="ui-datatable-data" in siteStyles reduces row paddings -->
+        <h:form id="PlaylistSongAddForm">
+            <p:panelGrid columns="2" columnClasses="label,value" style="width:100%;" cellpadding="5">
+            <!--
+                When the user clicks the Add button in DataTable.xhtml, actionListener="#{playlistSongController.prepareCreate}"
+                executes the prepareCreate method in which a new PlaylistSong object is instantiated and its object reference
+                is stored in the "selected" instance variable. Thus, "selected" points to a newly created PlaylistSong object
+                with property (instance variable) values set to empty or null. The inputText data fields below are
+                intended to assign user-provided values to the properties of the newly created PlaylistSong object.
+                -->
+                <!-- Playlist Dropdown -->
+                <p:outputLabel for="playlistName" value="#{bundle.SelectPlaylist}:" style="font-weight: bold;" />
+                <p:selectOneMenu id="playlistName"
+                                 value="#{playlistSongController.selected.playlist_id}"
+                                 converter="#{playlistController}"
+                                 required="true"
+                                 requiredMessage="#{bundle.PleaseSelectPlaylist}."
+                                 style="width:100%;">
+                    <f:selectItem itemLabel="#{bundle.SelectPlaylist}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{playlistController.listOfPlaylist}"
+                                   var="playlist"
+                                   itemValue="#{playlist}"
+                                   itemLabel="#{playlist.name}" />
+                </p:selectOneMenu>
+                <h:outputText />
+                <p:message for="playlistName" style="color: red;" display="text" />
+
+            </p:panelGrid>
+            <h:panelGroup>
+                <br/>
+                <div align="center">
+                    <!-- ADD button -->
+                    <p:commandButton value="#{bundle.Add}" icon="fas fa-plus" styleClass="rounded-button"
+                                     ajax="false" actionListener="#{playlistSongController.create()}"
+                                     update="display,:PlaylistSongListForm:datalist,:growlInfoMessage,:growlWarningMessage,:growlErrorMessage,:growlFatalMessage"
+                                     oncomplete="handleSubmit(args,'PlaylistSongAddDialog');"/>
+                    &nbsp;
+                    <!--
+                    CANCEL button: Call the cancel() method immediately without first rendering this Jakarta Faces page.
+                    The cancel() method will make the selected park visit object null and show the List page.
+                    -->
+                    <p:commandButton value="#{bundle.Cancel}" icon="fas fa-ban" styleClass="ui-button-outlined"
+                                     action="#{userSongController.cancel()}" ajax="false" immediate="true"
+                                     onclick="PF('PlaylistSongAddDialog').hide()"/>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

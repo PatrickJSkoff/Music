@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+
+<!-- This page is constructed based on the siteTemplate -->
+<ui:composition template="/template/siteTemplate.xhtml">
+   <ui:define name="title">
+      <!-- Set the page title -->
+      <h:outputText value="#{bundle.SearchConcert}" />
+   </ui:define>
+
+   <!-- Create the content for this page below -->
+   <ui:define name="editableContent">
+
+      <div align="center">
+         <h1>#{bundle.SearchForConcert}</h1>
+         <h:form id="SearchByConcertForm">
+            <br /><br />
+            <fieldset style="width: 50%">
+               <!-- Concert/Artist/Venue name search -->
+               <span class="ui-outputlabel-label">#{bundle.ConcertNameOr}:</span>
+               <br /><br />
+               <p:inputText value="#{apiSearchByConcertController.nameQuery}" style="width:40%" placeholder="#{bundle.ConcertNameOr}" />
+               <br /><br />
+
+               <!-- Date range -->
+               <span class="ui-outputlabel-label">#{bundle.SearchBetDates}:</span>
+               <br /><br />
+               <p:calendar value="#{apiSearchByConcertController.startDate}" pattern="MM/dd/yyyy" placeholder="#{bundle.StartDate}" />
+               <p:calendar value="#{apiSearchByConcertController.endDate}" pattern="MM/dd/yyyy" placeholder="#{bundle.EndDate}" />
+               <br /><br />
+
+               <!-- Location selection -->
+               <span class="ui-outputlabel-label">#{bundle.SearchByLocation}:</span>
+               <br /><br />
+
+               <!-- Button to activate current location (example triggers JS function to set coordinates) -->
+               <p:commandButton value="#{bundle.UseCurLoc}" icon="fas fa-location" styleClass="rounded-button" onclick="getCurrentLocationAndSend(); return false;" update="@form"/>
+               <br/> <br/>
+               <!-- OR map-based coordinate picker (this assumes you're using something like PrimeFaces gmap or Leaflet) -->
+               <p:outputPanel>
+                  <p:commandButton value="#{bundle.PickLocation}"
+                                   id="locationPick"
+                                   icon="fa-solid fa-map-pin"
+                                   styleClass="rounded-button"
+                                   onclick="loadMapMarker(); setTimeout(function() { PF('LocationPickerDialog').show(); }, 150); return false;" />
+
+
+               </p:outputPanel>
+               <br />
+
+               <!-- Radius input -->
+               <p:outputLabel value="#{bundle.SearchRadius}:" />
+               <br />
+               <p:inputNumber value="#{apiSearchByConcertController.radiusMiles}"
+                              placeholder="e.g. 25"
+                              decimalPlaces="0"
+                              minValue="0"
+                              maxValue="1000" />
+
+               <br /><br />
+               <!-- Number of concerts to return -->
+               <p:outputLabel value="#{bundle.SelectMax}:" />
+               <br />
+               <p:selectOneMenu id="maxResults" value="#{apiSearchByConcertController.maxResults}"
+                                required="true" requiredMessage="#{bundle.PleaseSelectMax}!">
+
+                  <f:selectItem itemLabel="#{bundle.SelectMax}" itemValue="" noSelectionOption="true"/>
+                  <f:selectItem itemLabel="5" itemValue="5"/>
+                  <f:selectItem itemLabel="10" itemValue="10"/>
+                  <f:selectItem itemLabel="20" itemValue="20"/>
+                  <f:selectItem itemLabel="30" itemValue="30"/>
+                  <f:selectItem itemLabel="40" itemValue="40"/>
+               </p:selectOneMenu>
+               <br/><br/>
+
+               <!-- Search Button -->
+               <p:commandButton value="#{bundle.SearchConcert}" icon="fas fa-search" styleClass="rounded-button"
+                                action="#{apiSearchByConcertController.performSearch(apiSearchByConcertController.baseUrl)}" ajax="false">
+               </p:commandButton>
+               <br /><br />
+            </fieldset>
+            <p:remoteCommand name="sendLocationToServer"
+                             action="#{apiSearchByConcertController.useCurrentLocation}"
+                             process="@this"
+                             update="locationPick">
+            </p:remoteCommand>
+            <p:remoteCommand name="loadMapMarker"
+                             action="#{apiSearchByConcertController.getPickLocationMapModel()}"
+                             update="LocationPickerForm:pickMap LocationPickerForm:latField LocationPickerForm:lngField" />
+
+         </h:form>
+      </div>
+      <!-- Clicking the Map button displays the included Map.xhtml file in a dialog window on top of this page. -->
+      <ui:include src="/search/LocationPicker.xhtml"/>
+      <h:outputScript>
+         function getCurrentLocationAndSend() {
+         if (navigator.geolocation) {
+         navigator.geolocation.getCurrentPosition(function (position) {
+         const lat = position.coords.latitude;
+         const lng = position.coords.longitude;
+
+         sendLocationToServer([
+         {name: 'lat', value: lat},
+         {name: 'lng', value: lng}
+         ]);
+         }, function (error) {
+         alert('Error getting location: ' + error.message);
+         });
+         } else {
+         alert('Geolocation is not supported by this browser.');
+         }
+         }
+      </h:outputScript>
+   </ui:define>
+</ui:composition>
+</html>

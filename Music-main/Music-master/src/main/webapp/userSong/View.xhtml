@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  - Created by Osman Balci on 2025.2.7 and Benjamin Scoppa on 2025.4.30
+  - Copyright © 2025 Osman Balci. All rights reserved.
+  -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core"
+      xmlns:f="jakarta.faces.core">
+
+<ui:composition>
+    <!--
+    ==========================================================
+    |  Clicking the VIEW button in DataTable.xhtml displays this  |
+    |  Dialog window showing the selected user song data.    |
+    ==========================================================
+    height="400" makes the dialog window to be vertically scrollable
+    width="60%" and responsive="true" make the dialog window horizontally responsive
+    class="scalableImage" makes the displayed image responsive
+    -->
+    <p:dialog id="UserSongViewDlg" header="#{userSongController.selected.name}" widgetVar="UserSongViewDialog"
+              modal="true" position="center" appendTo="@(body)" width="70%" height="500"
+              showEffect="slide" hideEffect="fade" responsive="true" >
+        <!--
+        Various effect options can be used when showing and closing the dialog.
+        Use showEffect and hideEffect options to apply these effects:
+            blind, bounce, clip, drop, explode, fade, fold, highlight, puff,
+            pulsate, scale, shake, size, slide and transfer. [PrimeFaces Documentation]
+        -->
+        <h:form id="UserSongViewForm" class="ui-datatable-data">
+            <div align="center">
+                <p:panel style="text-align: center; width:95%;">
+                    <h:panelGroup id="display">
+                        <!-- Display the selected songs's album art -->
+                        <img src="#{userSongController.selected.album_artwork_url}" class="scalableImage" style="width:50%"
+                             onerror="this.onerror=null;this.src='/Music/resources/images/DefaultAlbum.png';" />
+
+                        <br /><br />
+                        <table border="1" align="center" cellpadding="5" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.SongName}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.name}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.SongSpotifyId}:"/>
+                                </td>
+                                <td align="left" valign="middle"  bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.spotify_id}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.Duration} (hh:mm:ss):"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.duration}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.ReleaseDate}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.getFormattedReleaseDate()}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.ArtistName}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.artist_name}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.ArtistSpotifyId}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.artist_spotify_id}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.AlbumName}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.album_name}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.Explicit}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.is_explicit ? 'Yes' : 'No'}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.YoutubeId}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.youtube_video_id}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.LyricsSnippet}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userSongController.selected.lyrics_snippet}"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </h:panelGroup>
+                    <br />
+                    <h:panelGroup>
+                        <!-- CLOSE button -->
+                        <p:commandButton value="#{bundle.Close}" icon="fas fa-window-close" styleClass="ui-button-outlined"
+                                         onclick="PF('UserSongViewDialog').hide()" />
+                    </h:panelGroup>
+                </p:panel>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

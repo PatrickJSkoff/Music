@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+
+<!-- This page is constructed based on the siteTemplate -->
+<ui:composition template="/template/siteTemplate.xhtml">
+    <ui:define name="title">
+        <!-- Set the page title -->
+        <h:outputText value="#{bundle.Directions}"/>
+    </ui:define>
+
+    <!-- Create the content for this page below -->
+    <ui:define name="editableContent">
+
+        <h:form id="DirectionsForm">
+            <p:panel header="#{bundle.GetDirectionsTo} #{userConcertController.selected.venue_name}"
+                     style="width: 100%; max-width: 800px; margin: auto;">
+
+                <!-- User input for starting location -->
+                <p:outputLabel value="#{bundle.StartingLocation}:" for="startLocation"/>
+                <div class="ui-inputgroup">
+                    <p:inputText id="startLocation" value="#{directionsController.startLocation}" style="width:100%;" placeholder="#{bundle.DirectionsFromPlaceholder}" />
+                    <p:commandButton icon="pi pi-map-marker" onclick="getCurrentLocationAndFill(); return false;" title="#{bundle.UseCurLoc}" styleClass="ui-button-secondary" />
+                </div>
+
+                <br/><br/>
+
+                <!-- Button to update the iframe -->
+                <p:button outcome="/userConcert/DataTable" value="Back"
+                          icon="fas fa-arrow-left" styleClass="ui-button-outlined" />
+                &nbsp;
+                <p:commandButton value="#{bundle.ShowDrivingDirections}" icon="fas fa-car" styleClass="rounded-button" ajax="false" action="#{directionsController.drivingDirections()}"
+                                 update="mapFrame"/>
+                &nbsp; &nbsp;
+                <p:commandButton value="#{bundle.ShowWalkingDirections}" icon="fas fa-walking" styleClass="rounded-button" ajax="false" action="#{directionsController.walkDirections()}"
+                                 update="mapFrame"/>
+                &nbsp; &nbsp;
+                <p:commandButton value="#{bundle.ShowBikeDirections}" icon="fas fa-bicycle" styleClass="rounded-button" ajax="false" action="#{directionsController.bikeDirections()}"
+                                 update="mapFrame"/>
+                &nbsp; &nbsp;
+                <p:commandButton value="#{bundle.ShowTransitDirections}" icon="fas fa-bus" styleClass="rounded-button" ajax="false" action="#{directionsController.transitDirections()}"
+                                 update="mapFrame"/>
+                <br/><br/>
+
+                <!-- Google Map iframe to show directions -->
+                <p:outputPanel id="mapFrame" style="width:100%; height:500px;">
+                    <iframe width="100%" height="500"
+                            frameborder="0" style="border:0"
+                            src="#{directionsController.directionsUrl}"
+                            allow="fullscreen">
+                    </iframe>
+                </p:outputPanel>
+
+            </p:panel>
+        </h:form>
+
+        <!-- Add this script block to get user's location -->
+        <h:outputScript>
+            function getCurrentLocationAndFill() {
+            if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            // Set the input field value to "lat,lng" format
+            document.getElementById('DirectionsForm:startLocation').value = lat + ',' + lng;
+            }, function (error) {
+            alert('Unable to retrieve location: ' + error.message);
+            });
+            } else {
+            alert('Geolocation is not supported by your browser.');
+            }
+            }
+        </h:outputScript>
+
+    </ui:define>
+</ui:composition>
+</html>

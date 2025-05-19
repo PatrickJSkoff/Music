@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<faces-config version="4.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                                  https://jakarta.ee/xml/ns/jakartaee/web-facesconfig_4_0.xsd" >
+    <application>
+
+        <!-- Setting default and supported languages: 'en' English, 'pt' Portuguese, 'tr' Turkish  -->
+        <locale-config>
+            <default-locale>en</default-locale>
+            <supported-locale>pt</supported-locale>
+            <supported-locale>tr</supported-locale>
+        </locale-config>
+
+        <!--
+        The .properties files in [Resource Bundle 'language'] define your
+        user interface text labels and (error) messages in different languages:
+
+        * 'language_en.properties' file contains the list of UI text labels in English
+        * 'language_pt.properties' file contains the list of UI text labels in Portuguese
+        * 'language_tr.properties' file contains the list of UI text labels in Turkish
+
+        To internationalize your app with a different language, .properties file is
+        recreated for the desired language, e.g., 'fr' French, language_fr.properties.
+
+        See the list of languages supported by Java 17 at
+        https://www.oracle.com/java/technologies/javase/jdk17-suported-locales.html
+
+        The following specifies the resource bundle base name as 'language', and
+        the variable name used to refer to a property as 'bundle'. The variable 'bundle'
+        is used in an EL statement to obtain the string in selected language. For example:
+        #{bundle.Cancel} obtains the text for the key 'Cancel' in selected language.
+        -->
+        <resource-bundle>
+            <base-name>/language</base-name>
+            <var>bundle</var>
+        </resource-bundle>
+
+    </application>
+  
+</faces-config>

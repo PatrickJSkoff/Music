@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core"
+      xmlns:f="jakarta.faces.core">
+
+<ui:composition>
+    <!--
+    ==========================================================
+    |  Clicking the VIEW button in DataTable.xhtml displays this  |
+    |  Dialog window showing the selected user song data.    |
+    ==========================================================
+    height="400" makes the dialog window to be vertically scrollable
+    width="60%" and responsive="true" make the dialog window horizontally responsive
+    class="scalableImage" makes the displayed image responsive
+    -->
+    <p:dialog id="UserConcertViewDlg" header="#{userConcertController.selected.event_name}" widgetVar="UserConcertViewDialog"
+              modal="true" position="center" appendTo="@(body)" width="70%" height="500"
+              showEffect="slide" hideEffect="fade" responsive="true" >
+        <!--
+        Various effect options can be used when showing and closing the dialog.
+        Use showEffect and hideEffect options to apply these effects:
+            blind, bounce, clip, drop, explode, fade, fold, highlight, puff,
+            pulsate, scale, shake, size, slide and transfer. [PrimeFaces Documentation]
+        -->
+        <h:form id="UserConcertViewForm" class="ui-datatable-data">
+            <div align="center">
+                <p:panel style="text-align: center; width:95%;">
+                    <h:panelGroup id="display">
+                        <!-- Display the selected songs's album art -->
+                        <img src="#{userConcertController.selected.image_url}" class="scalableImage" style="width:50%"
+                             onerror="this.onerror=null;this.src='/Music/resources/images/DefaultAlbum.png';" />
+
+                        <br /><br />
+                        <table border="1" align="center" cellpadding="5" cellspacing="0">
+                            <tbody>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.EventName}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userConcertController.selected.event_name}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.ArtistName}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userConcertController.selected.artist_name}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.EventDate}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userConcertController.selected.startDateTime}">
+                                        <!--
+                                        Date is stored in the database in the format YYYY-MM-DD so that it is sortable.
+                                        For display purposes, we convert the database format to MM/DD/YYYY.
+                                        -->
+                                        <f:convertDateTime pattern="MM/dd/yyyy"/>
+                                    </h:outputText>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.VenueName}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userConcertController.selected.venue_name}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.VenueLocation}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userConcertController.selected.venue_city}, #{userConcertController.selected.venue_state}"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.TicketLink}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputLink value="#{userConcertController.selected.event_url}" target="_blank">
+                                        <h:outputText value="View on Ticketmaster" />
+                                    </h:outputLink>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                    <h:outputText value="#{bundle.EventDescription}:"/>
+                                </td>
+                                <td align="left" valign="middle" bgcolor="oldlace">
+                                    <h:outputText value="#{userConcertController.selected.description}"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </h:panelGroup>
+                    <br />
+                    <h:panelGroup>
+                        <!-- CLOSE button -->
+                        <p:commandButton value="#{bundle.Close}" icon="fas fa-window-close" styleClass="ui-button-outlined"
+                                         onclick="PF('UserConcertViewDialog').hide()" />
+                    </h:panelGroup>
+                </p:panel>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

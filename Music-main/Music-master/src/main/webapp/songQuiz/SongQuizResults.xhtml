@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core">
+
+    <!-- This page is constructed based on the siteTemplate -->
+    <ui:composition template="/template/siteTemplate.xhtml">
+        <ui:define name="title">
+            <!-- Set the page title -->
+            <h:outputText value="${bundle.SongQuizResults}" />
+        </ui:define>
+
+        <!-- Create the content for this page below -->
+        <ui:define name="editableContent">
+            <div align="center">
+                <h:form id="SongQuizResultForm">
+                    <h1>${bundle.SongQuizResults}</h1>
+                    <p:panel style="text-align: center; width:80%;">
+                        <!-- Display message and Score -->
+                        <h:panelGroup layout="block" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+
+                            <h:outputText value="" style="flex: 1;" />
+
+                            <h:outputLabel value="#{songQuizController.guessOutput}"
+                                           style="flex: 1; text-align: center; font-weight: bold; font-size: 1.5vw; color: #000000;" />
+
+                            <h:outputText value="Score: #{songQuizController.score} / #{songQuizController.totalGuesses}"
+                                          style="flex: 1; text-align: right; font-weight: bold; font-size: 1.2vw; color: black; padding-right: 1.5vw;" />
+                        </h:panelGroup>
+                        <br/>
+                        <!-- Display both guess and correct song -->
+                        <h:panelGrid columns="2" cellpadding="5" style="margin:auto;">
+                            <h:panelGroup>
+                                <h:outputLabel value="Your Guess:" style="font-weight: bold;" />
+                                <br/>
+                                <img src="#{empty songQuizController.albumArtGuess ? '/Music/resources/images/DefaultAlbum.png' : songQuizController.albumArtGuess}"
+                                     style="width: 100%; max-width: 200px; aspect-ratio: 1 / 1; object-fit: cover; height: auto;"
+                                     onerror="this.onerror=null;this.src='/Music/resources/images/DefaultAlbum.png';" />
+                                <br/>
+                                <h:outputText value="#{songQuizController.songGuess}" />
+                                <br/>
+                                <h:outputText value="#{songQuizController.artistGuess}" />
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <h:outputLabel value="Correct Song:" style="font-weight: bold;" />
+                                <br/>
+                                <img src="#{songQuizController.songCorrect.album_artwork_url}"
+                                     style="width: 100%; max-width: 200px; aspect-ratio: 1 / 1; object-fit: cover; height: auto;"
+                                     onerror="this.onerror=null;this.src='/Music/resources/images/DefaultAlbum.png';" />
+                                <br/>
+                                <h:outputText value="#{songQuizController.songCorrect.name}" />
+                                <br/>
+                                <h:outputText value="#{songQuizController.songCorrect.artist_name}" />
+                            </h:panelGroup>
+                        </h:panelGrid>
+                    </p:panel>
+                    <br/>
+                    &nbsp;
+                    <p:commandButton action="#{songQuizController.randomSongLyrics()}" value="#{bundle.PlayAgain}"
+                                     icon="fas fa-redo" styleClass="ui-button-outlined" />
+                    <br/><br/>
+                </h:form>
+            </div>
+        </ui:define>
+    </ui:composition>
+</html>

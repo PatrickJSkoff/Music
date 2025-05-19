@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  - Created by Osman Balci on 2025.2.7 and Benjamin Scoppa on 2025.4.30
+  - Copyright © 2025 Osman Balci. All rights reserved.
+  -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core">
+
+    <!-- This page is constructed based on the siteTemplate -->
+    <ui:composition template="/template/siteTemplate.xhtml">
+        <ui:define name="title">
+            <!-- Set the page title -->
+            <h:outputText value="#{bundle.UserSongs}" />
+        </ui:define>
+
+        <!-- Create the content for this page below -->
+        <ui:define name="editableContent">
+
+            <!-- Set 'selected' to null in userSongController if user closes the Edit dialogue-->
+            <c:if test="#{facesContext.validationFailed}">
+                ${userSongController.unselect()}
+            </c:if>
+
+            <!-- Set 'selected' to null in userSongController when the user refreshes / reloads this Jakarta Faces page -->
+            <f:metadata>
+                <f:viewAction action="#{userSongController.unselect()}" rendered="#{facesContext.postback}" />
+            </f:metadata>
+
+            <c:if test="#{userController.userIsSignedIn() == true}">
+                <div align="center">
+                    <h:form id="UserSongListForm">
+                        <p:panel header="#{userSongController.formattedUserSongsHeader}">
+                            <p:dataTable id="datalist"
+                                         value="#{userSongController.listOfSongs}"
+                                         var="aUserSong"
+                                         widgetVar="userSongDataTable"
+                                         selectionMode="single"
+                                         selection="#{userSongController.selected}"
+                                         reflow="true"
+                                         showGridlines="true"
+                                         paginator="true"
+                                         rowKey="#{aUserSong.id}"
+                                         rows="5"
+                                         rowsPerPageTemplate="5,10,20,30,50,70,90"
+                                         emptyMessage="#{bundle.NoSongsFound}" >
+
+                                <p:ajax event="rowSelect"   update="createButton viewButton editButton searchArtistsButton searchConcertsButton searchAlbumButton deleteButton playButton addButton" />
+                                <p:ajax event="rowUnselect" update="createButton viewButton editButton searchArtistsButton searchConcertsButton searchAlbumButton deleteButton playButton addButton" />
+
+                                <!--
+                                *************************
+                                *   Data Table Header   *
+                                *************************
+                                -->
+                                <f:facet name="header">
+                                    <div align="center">
+                                        <p:inputText id="globalFilter" onkeyup="PF('userSongDataTable').filter()" filterMatchMode="contains"
+                                                     style="width: 250px"
+                                                     placeholder="#{bundle.GlobalSearchQuery}" />
+                                        &nbsp;
+                                        <p:commandButton type="button" value="#{bundle.ClearAllFilters}" styleClass="ui-button-outlined"
+                                                         icon="fas fa-undo" onclick="PF('userSongDataTable').clearFilters()" />
+                                    </div>
+                                </f:facet>
+
+                                <!--
+                                ********************************
+                                *       Album Photo      *
+                                ********************************
+                                -->
+                                <p:column headerText="#{bundle.AlbumArtwork}" style="width:100px; text-align: center; vertical-align: top">
+                                    <img src="#{aUserSong.album_artwork_url}" class="scalableImage" onerror="this.onerror=null;this.src='/Music/resources/images/DefaultAlbum.png';" />
+                                </p:column>
+
+                                <!--
+                                **********************
+                                *    User Song Name    *
+                                **********************
+                                -->
+                                <p:column headerText="#{bundle.SongName}" sortBy="#{aUserSong.name}"
+                                          filterBy="#{aUserSong.name}" filterMatchMode="contains"
+                                          style="vertical-align: top">
+                                    <h:outputText value="#{aUserSong.nameExplicit}"/>
+                                </p:column>
+
+                                <!--
+                                **********************
+                                *    User Song Artist Name    *
+                                **********************
+                                -->
+                                <p:column headerText="#{bundle.ArtistName}" sortBy="#{aUserSong.artist_name}"
+                                          filterBy="#{aUserSong.artist_name}" filterMatchMode="contains"
+                                          style="vertical-align: top">
+                                    <h:outputText value="#{aUserSong.artist_name}"/>
+                                </p:column>
+
+                                <!--
+                                ********************
+                                *   User Song Album Name   *
+                                ********************
+                                -->
+                                <p:column headerText="#{bundle.AlbumName}" sortBy="#{aUserSong.album_name}"
+                                          filterBy="#{aUserSong.album_name}" filterMatchMode="contains"
+                                          style="vertical-align: top">
+                                    <h:outputText value="#{aUserSong.album_name}"/>
+                                </p:column>
+
+                                <!--
+                                ********************
+                                *   User Song Duration   *
+                                ********************
+                                -->
+                                <p:column headerText="#{bundle.Duration}" sortBy="#{aUserSong.duration}"
+                                          style="width:90px; text-align: center; vertical-align: top">
+                                    <h:outputText value="#{userSongController.getFormattedDuration(aUserSong.duration)}"/>
+                                </p:column>
+
+                                <!--
+                                ********************
+                                *   User Song Release Date   *
+                                ********************
+                                -->
+                                <p:column headerText="#{bundle.ReleaseDate}" sortBy="#{aUserSong.release_date}"
+                                          filterBy="#{aUserSong.release_date}" filterMatchMode="contains"
+                                          style="width: 100px; text-align: center; vertical-align: top">
+                                    <h:outputText value="#{aUserSong.getFormattedReleaseDate()}" />
+                                </p:column>
+
+
+                                <!--
+                                *************************
+                                *   Data Table Footer   *
+                                *************************
+                                -->
+                                <f:facet name="footer">
+                                    <div align="center">
+                                        &nbsp;
+                                        <!-- VIEW button: id is used since it is referenced to be activated or deactivated -->
+                                        <p:commandButton id="viewButton" value="#{bundle.View}" icon="fas fa-eye" styleClass="rounded-button"
+                                                         update=":UserSongViewDlg" oncomplete="PF('UserSongViewDialog').show()"
+                                                         disabled="#{empty userSongController.selected}"/>
+                                        &nbsp;
+                                        <!-- Searches for artist from selected song song -->
+                                        <p:commandButton id="searchArtistsButton" value="#{bundle.SearchArtist}" icon="fas fa-search" styleClass="rounded-button"
+                                                         action="#{apiSearchByArtistNameController.performSongArtistSearch()}"
+                                                         disabled="#{empty userSongController.selected}"/>
+                                        &nbsp;
+                                        <!-- Searches for concerts from selected song -->
+                                        <p:commandButton id="searchConcertsButton" value="#{bundle.SearchConcerts}" icon="fas fa-search" styleClass="rounded-button"
+                                                         action="#{apiSearchByConcertController.performConcertSearchFromUserSong()}"
+                                                         disabled="#{empty userSongController.selected}"/>
+                                        &nbsp;
+                                        <!-- Searches for album from selected song -->
+                                        <p:commandButton id="searchAlbumButton" value="#{bundle.SearchAlbum}" icon="fas fa-search" styleClass="rounded-button"
+                                                         action="#{apiSearchByAlbumNameController.performAlbumSearch()}"
+                                                         disabled="#{empty userSongController.selected}"/>
+                                        &nbsp;
+                                        <!-- ***************************************************
+                                        Display a Confirmation dialog for the DELETE button
+                                        id is used since it is referenced to be activated or not
+                                        **************************************************** -->
+                                        <p:commandButton id="deleteButton" value="#{bundle.Delete}" icon="fas fa-trash-alt"  styleClass="rounded-button"
+                                                         actionListener="#{userSongController.destroy()}"
+                                                         update="datalist,:growlInfoMessage,:growlWarningMessage,:growlErrorMessage,:growlFatalMessage"
+                                                         disabled="#{empty userSongController.selected}">
+
+                                            <p:confirm header="#{bundle.DeletionConfirmation}"
+                                                       message="#{bundle.SureDeleteSelectedSong} #{userSongController.selected.name} #{bundle.FromTheDatabase}?"/>
+                                        </p:commandButton>
+
+                                        <p:confirmDialog id="confirmDialogBox" global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                                            <div align="center">
+                                                <p:commandButton value="#{bundle.No}" type="button" styleClass="ui-confirmdialog-no" icon="fas fa-window-close" />
+                                                &nbsp;
+                                                <p:commandButton value="#{bundle.Yes}" type="button" class="ui-confirmdialog-yes ui-button-danger" icon="fas fa-check-square" />
+                                            </div>
+                                        </p:confirmDialog>
+                                        <!-- *******************************************
+                                        End of Display of the DELETE Confirmation dialog
+                                        ******************************************** -->
+                                        &nbsp;
+                                        <p:commandButton id="playButton" value="#{bundle.Play}" icon="fas fa-play" styleClass="rounded-button"
+                                                         update=":VideoPlayForm" oncomplete="PF('VideoPlayDialog').show()"
+                                                         disabled="#{empty userSongController.selected}" />
+                                        &nbsp;
+                                        <!-- ADD button: id is used since it is referenced to be activated or deactivated -->
+                                        <p:commandButton id="addButton" value="#{bundle.AddToPlaylist}" icon="fas fa-plus" styleClass="rounded-button"
+                                                         actionListener="#{playlistSongController.prepareCreate()}"
+                                                         update=":PlaylistSongAddForm" oncomplete="PF('PlaylistSongAddDialog').show()"
+                                                         disabled="#{empty userSongController.selected}" />
+                                    </div>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </h:form>
+                </div>
+            </c:if>
+            <c:if test="#{userController.userIsSignedIn() == false}">
+                <div align="center"><h1>#{bundle.CyberWarning}</h1></div>
+            </c:if>
+
+            <!-- Clicking the View button displays the included View.xhtml file in a dialog window on top of this page. -->
+            <ui:include src="/userSong/View.xhtml"/>
+
+            <!-- Clicking the Play button displays the included YouTubeVideoPlayer.xhtml file in a dialog window on top of this page. -->
+            <ui:include src="/userSong/YouTubeVideoPlayer.xhtml"/>
+
+            <!-- Clicking the Add button displays the included Add.xhtml file in a dialog window on top of this page. -->
+            <ui:include src="/userSong/Add.xhtml"/>
+
+        </ui:define>
+    </ui:composition>
+</html>

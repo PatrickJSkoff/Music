@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core">
+
+<ui:composition>
+    <!--
+    =========================================================
+    |  Clicking the Location on Map button in SearchConcertResults.xhtml displays this  |
+    |  Dialog window showing the selected venue's location on map.    |
+    =========================================================
+    -->
+    <p:dialog id="MapViewDlg" header="#{apiSearchByConcertController.selected.venue_name}"
+              widgetVar="MapViewDialog" modal="true" position="center" appendTo="@(body)"
+              showEffect="slide" hideEffect="fade" responsive="true">
+
+        <h:form id="MapViewForm">
+            <div align="center">
+                <c:if test="#{apiSearchByConcertController.selected != null}">
+                    <p:gmap center="#{apiSearchByConcertController.selected.venue_latitude}, #{apiSearchByConcertController.selected.venue_longitude}"
+                            zoom="9" type="roadmap" style="width:600px;height:400px"
+                            model="#{apiSearchByConcertController.getGoogleMap()}"/>
+                </c:if>
+                <br/><br/>
+                <h:panelGroup>
+                    <!-- CLOSE button -->
+                    <p:commandButton value="Close" icon="fas fa-window-close" styleClass="ui-button-outlined"
+                                     onclick="PF('MapViewDialog').hide()"/>
+                </h:panelGroup>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

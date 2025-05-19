@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core">
+
+<!-- This page is constructed based on the siteTemplate -->
+<ui:composition template="/template/siteTemplate.xhtml">
+    <ui:define name="title">
+        <!-- Set the page title -->
+        <h:outputText value="#{bundle.ArtistsFound}" />
+    </ui:define>
+
+    <!-- Create the content for this page below -->
+    <ui:define name="editableContent">
+
+        <!-- In case of Jakarta Faces validation error, set 'selected' to null in searchByStateController -->
+        <c:if test="#{facesContext.validationFailed}">
+            ${apiSearchByArtistNameController.unselect()}
+        </c:if>
+
+        <!-- Set 'selected' to null in searchByStateController when the user refreshes / reloads this Jakarta Faces page -->
+        <f:metadata>
+            <f:viewAction action="#{apiSearchByArtistNameController.unselect()}" rendered="#{facesContext.postback}" />
+        </f:metadata>
+
+        <div align="center">
+            <h:form id="ArtistListForm">
+                <p:panel header="#{bundle.ListArtists}">
+                    <p:dataTable id="datalist"
+                                 value="#{apiSearchByArtistNameController.foundArtists}"
+                                 var="aArtist"
+                                 widgetVar="artistsDataTable"
+                                 selectionMode="single"
+                                 selection="#{apiSearchByArtistNameController.selected}"
+                                 reflow="true"
+                                 showGridlines="true"
+                                 paginator="true"
+                                 rowKey="#{aArtist.spotify_id}"
+                                 rows="5"
+                                 rowsPerPageTemplate="5,10,20,30,50,70,90"
+                                 emptyMessage="#{bundle.NoArtistFound}!" >
+
+                        <p:ajax event="rowSelect"   update="addButton"/>
+                        <p:ajax event="rowUnselect" update="addButton"/>
+
+                        <!--
+                        ********************************
+                        *       Artist Photo      *
+                        ********************************
+                        -->
+                        <p:column headerText="#{bundle.ArtistPhoto}" style="width:100px; text-align: center; vertical-align: top">
+                            <h:graphicImage value="#{aArtist.image_url}" class="scalableImage"/>
+                        </p:column>
+
+                        <!--
+                        ********************
+                        *   Artist Name   *
+                        ********************
+                        -->
+                        <p:column headerText="#{bundle.ArtistName}" sortBy="#{aArtist.name}"
+                                  filterBy="#{aArtist.name}" filterMatchMode="contains"
+                                  style="vertical-align: top">
+                            <h:outputText value="#{aArtist.name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{bundle.AlbumName}" style="vertical-align: top"
+                                  filterBy="#{aArtist.albums}" filterMatchMode="contains">
+                                  <h:outputText value="#{aArtist.albums}" styleClass="scrollableTextBox"/>
+                        </p:column>
+
+                        <!--
+                        *************************
+                        *   Data Table Footer   *
+                        *************************
+                        -->
+                        <f:facet name="footer">
+                            <div align="center">
+<!--                                &lt;!&ndash; VIEW button: id is used since it is referenced to be activated or deactivated &ndash;&gt;-->
+<!--                                <p:button id="viewButton" outcome="/apiSearchByState/View" value="View"-->
+<!--                                          icon="fas fa-eye" styleClass="rounded-button" />-->
+                                &nbsp;
+                                <p:button value="#{bundle.Back}" icon="fas fa-arrow-left" styleClass="ui-button-outlined"
+                                          outcome="#{apiSearchByArtistNameController.returnUrl}"
+                                          rendered="#{not empty apiSearchByArtistNameController.returnUrl}" />
+                                &nbsp;
+                                <p:commandButton id="addButton" value="#{bundle.AddToUserArtists}" icon="fas fa-plus" styleClass="rounded-button"
+                                                 actionListener="#{apiSearchByArtistNameController.shareToUserArtists()}"
+                                                 update="datalist,:growlInfoMessage,:growlWarningMessage,:growlErrorMessage,:growlFatalMessage"
+                                                 disabled="#{empty apiSearchByArtistNameController.selected}">
+
+                                    <p:confirm header="#{bundle.AddConfirmation}"
+                                               message="#{bundle.AddConfirmationArtistDialog}"/>
+                                </p:commandButton>
+
+                                <p:confirmDialog id="shareConfirmDialogBox" global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                                    <div align="center">
+                                        <p:commandButton value="#{bundle.No}" type="button" styleClass="ui-confirmdialog-no" icon="fas fa-window-close" />
+                                        &nbsp;
+                                        <p:commandButton value="#{bundle.Yes}" type="button" class="ui-confirmdialog-yes ui-button-danger" icon="fas fa-check-square" />
+                                    </div>
+                                </p:confirmDialog>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </div>
+
+    </ui:define>
+</ui:composition>
+</html>

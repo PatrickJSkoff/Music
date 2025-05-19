@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<!-- This page is constructed based on the siteTemplate -->
+<ui:composition template="/template/siteTemplate.xhtml">
+    <ui:define name="title">
+        <!-- Set the page title -->
+        <h:outputText value="#{bundle.SignIn}"/>
+    </ui:define>
+
+    <!-- Create the content for this page below -->
+    <ui:define name="editableContent">
+        <div align="center">
+            <h1>#{bundle.SignIn}</h1>
+            <br/>
+            <h:form>
+                <!--
+                ================================
+                |    Username and Password     |
+                ================================
+                -->
+                <table border="0" align="center" cellpadding="5" cellspacing="0">
+                    <tbody>
+                    <tr>
+                        <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                            <p:outputLabel value="#{bundle.Username}" for="username"/>
+                        </td>
+                        <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                            <p:inputText id="username" value="#{loginManager.username}" style="width: 290px"
+                                         required="true" requiredMessage="Username is required.">
+                            </p:inputText>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                            <p:outputLabel value="#{bundle.Password}" for="password"/>
+                        </td>
+                        <td align="left" valign="middle" nowrap="nowrap" bgcolor="oldlace">
+                            <p:password id="password" value="#{loginManager.password}" style="width: 290px"
+                                        required="true" requiredMessage="Username is required.">
+                            </p:password>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <br/>
+                <!--
+                ==========================
+                |        reCAPTCHA       |
+                ==========================
+                See the reCAPTCHA code snippet on the course website to learn about it.
+                *** Do NOT forget to enter the 2 context parameters in web.xml ***
+                -->
+                <p:captcha label="reCAPTCHA" required="true"
+                           requiredMessage="Please check the box to verify that you are not a robot!"/>
+                <br/><br/>
+                <!--
+                ==========================
+                |         Menubar        |
+                ==========================
+                -->
+                <p:menubar>
+                    <p:menuitem value="#{bundle.SignIn}" action="#{loginManager.loginUser()}" ajax="false" icon="fas fa-sign-in-alt"/>
+                    <p:menuitem value="#{bundle.CreateAccount}" outcome="/userAccount/CreateAccount" icon="fas fa-user-plus"/>
+                    <p:menuitem value="#{bundle.ForgotPassword}" outcome="/userPasswordChange/EnterUsername" icon="fas fa-key"/>
+                    <p:menuitem value="#{bundle.RecoverAccount}" outcome="/userAccountRecovery/RecoverAccount" icon="fas fa-retweet"/>
+                    <p:menuitem value="#{bundle.Cancel}" outcome="/index" icon="fas fa-ban"/>
+                </p:menubar>
+            </h:form>
+        </div>
+        <br/><br/>
+    </ui:define>
+</ui:composition>
+</html>

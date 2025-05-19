@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core">
+
+    <!-- This page is constructed based on the siteTemplate -->
+    <ui:composition template="/template/siteTemplate.xhtml">
+        <ui:define name="title">
+            <!-- Set the page title -->
+            <h:outputText value="#{bundle.UserArtists}" />
+        </ui:define>
+
+        <!-- Create the content for this page below -->
+        <ui:define name="editableContent">
+
+            <!-- Set 'selected' to null in userArtistController if user closes the Edit dialogue-->
+            <c:if test="#{facesContext.validationFailed}">
+                ${userArtistController.unselect()}
+            </c:if>
+
+            <!-- In case of Jakarta Faces validation error, set 'selected' to null in userArtistController -->
+            <h:form id="remoteCommandForm" style="display:none">
+                <p:remoteCommand name="clearUserArtistSelection" action="#{userArtistController.unselect}"/>
+            </h:form>
+
+            <!-- Set 'selected' to null in userArtistController when the user refreshes / reloads this Jakarta Faces page -->
+            <f:metadata>
+                <f:viewAction action="#{userArtistController.unselect()}" rendered="#{facesContext.postback}" />
+            </f:metadata>
+            <c:if test="#{userController.userIsSignedIn() == true}">
+                <div align="center">
+                    <h:form id="UserArtistListForm">
+                        <p:panel header="#{userArtistController.getFormattedUserArtistsHeader()}">
+                            <p:dataTable id="datalist"
+                                         value="#{userArtistController.listOfArtists}"
+                                         var="aUserArtist"
+                                         widgetVar="userArtistDataTable"
+                                         selectionMode="single"
+                                         selection="#{userArtistController.selected}"
+                                         reflow="true"
+                                         showGridlines="true"
+                                         paginator="true"
+                                         rowKey="#{aUserArtist.id}"
+                                         rows="5"
+                                         rowsPerPageTemplate="5,10,20,30,50,70,90"
+                                         emptyMessage="#{bundle.NoArtistFound}" >
+
+                                <p:ajax event="rowSelect"   update="viewButton albumViewButton searchSongsButton searchConcertsButton deleteButton"/>
+                                <p:ajax event="rowUnselect" update="viewButton albumViewButton searchSongsButton searchConcertsButton deleteButton"/>
+
+                                <!--
+                                *************************
+                                *   Data Table Header   *
+                                *************************
+                                -->
+                                <f:facet name="header">
+                                    <div align="center">
+                                        <p:inputText id="globalFilter" onkeyup="PF('userArtistDataTable').filter()" filterMatchMode="contains"
+                                                     style="width: 250px"
+                                                     placeholder="#{bundle.GlobalSearchQuery}" />
+                                        &nbsp;
+                                        <p:commandButton type="button" value="#{bundle.ClearAllFilters}" styleClass="ui-button-outlined"
+                                                         icon="fas fa-undo" onclick="PF('userArtistDataTable').clearFilters()" />
+                                    </div>
+                                </f:facet>
+
+                                <!--
+                               ********************************
+                               *       Artist Photo      *
+                               ********************************
+                               -->
+                                <p:column headerText="#{bundle.ArtistPhoto}" style="width:100px; text-align: center; vertical-align: top">
+                                    <h:graphicImage value="#{aUserArtist.image_url}" class="scalableImage"/>
+                                </p:column>
+
+                                <!--
+                                ********************
+                                *   Artist Name   *
+                                ********************
+                                -->
+                                <p:column headerText="#{bundle.ArtistName}" sortBy="#{aUserArtist.name}"
+                                          filterBy="#{aUserArtist.name}" filterMatchMode="contains"
+                                          style="vertical-align: top">
+                                    <h:outputText value="#{aUserArtist.name}"/>
+                                </p:column>
+
+
+                                <!--
+                                *************************
+                                *   Data Table Footer   *
+                                *************************
+                                -->
+                                <f:facet name="footer">
+                                    <div align="center">
+                                        <!-- VIEW button: id is used since it is referenced to be activated or deactivated -->
+                                        <p:commandButton id="viewButton" value="#{bundle.View}" icon="fas fa-eye" styleClass="rounded-button"
+                                                         update=":UserArtistViewDlg" oncomplete="PF('UserArtistViewDialog').show()"
+                                                         disabled="#{empty userArtistController.selected}"/>
+                                        &nbsp;
+                                        <!-- ALBUM VIEW button: id is used since it is referenced to be activated or deactivated -->
+                                        <p:commandButton id="albumViewButton" value="#{bundle.ViewAlbum}" icon="fas fa-eye" styleClass="rounded-button"
+                                                         update=":UserArtistAlbumViewDlg" oncomplete="PF('UserArtistAlbumViewDialog').show()"
+                                                         disabled="#{empty userArtistController.selected}"/>
+                                        &nbsp;
+                                        <!-- Searches for songs from selected artist -->
+                                        <p:commandButton id="searchSongsButton" value="#{bundle.SearchSongs}" icon="fas fa-search" styleClass="rounded-button"
+                                                         action="#{apiSearchBySongNameController.performArtistSearch()}"
+                                                         disabled="#{empty userArtistController.selected}"/>
+                                        &nbsp;
+                                        <!-- Searches for concerts from selected artist -->
+                                        <p:commandButton id="searchConcertsButton" value="#{bundle.SearchConcerts}" icon="fas fa-search" styleClass="rounded-button"
+                                                         action="#{apiSearchByConcertController.performArtistSearch()}"
+                                                         disabled="#{empty userArtistController.selected}"/>
+                                        &nbsp;
+                                        <!-- ***************************************************
+                                        Display a Confirmation dialog for the DELETE button
+                                        id is used since it is referenced to be activated or not
+                                        **************************************************** -->
+                                        <p:commandButton id="deleteButton" value="#{bundle.Delete}" icon="fas fa-trash-alt"  styleClass="rounded-button"
+                                                         actionListener="#{userArtistController.destroy()}"
+                                                         update="datalist,:growlInfoMessage,:growlWarningMessage,:growlErrorMessage,:growlFatalMessage"
+                                                         disabled="#{empty userArtistController.selected}">
+
+                                            <p:confirm header="#{bundle.DeletionConfirmation}"
+                                                       message="#{bundle.SureDeleteSelectedArtist} #{userArtistController.selected.name} #{bundle.FromTheDatabase}?"/>
+                                        </p:commandButton>
+
+                                        <p:confirmDialog id="confirmDialogBox" global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                                            <div align="center">
+                                                <p:commandButton value="#{bundle.No}" type="button" styleClass="ui-confirmdialog-no" icon="fas fa-window-close" />
+                                                &nbsp;
+                                                <p:commandButton value="#{bundle.Yes}" type="button" class="ui-confirmdialog-yes ui-button-danger" icon="fas fa-check-square" />
+                                            </div>
+                                        </p:confirmDialog>
+                                        <!-- *******************************************
+                                        End of Display of the DELETE Confirmation dialog
+                                        ******************************************** -->
+                                    </div>
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </h:form>
+                </div>
+            </c:if>
+            <c:if test="#{userController.userIsSignedIn() == false}">
+                <div align="center"><h1>#{bundle.CyberWarning}</h1></div>
+            </c:if>
+
+            <!-- Clicking the View button displays the included View.xhtml file in a dialog window on top of this page. -->
+            <ui:include src="/userArtist/View.xhtml"/>
+
+            <ui:include src="/userArtist/AlbumView.xhtml"/>
+
+        </ui:define>
+    </ui:composition>
+</html>

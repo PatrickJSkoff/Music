@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core">
+
+<!-- This page is constructed based on the siteTemplate -->
+<ui:composition template="/template/siteTemplate.xhtml">
+    <ui:define name="title">
+        <!-- Set the page title -->
+        <h:outputText value="#{bundle.ConcertsFound}" />
+    </ui:define>
+
+    <!-- Create the content for this page below -->
+    <ui:define name="editableContent">
+
+        <!-- In case of Jakarta Faces validation error, set 'selected' to null in searchByStateController -->
+        <c:if test="#{facesContext.validationFailed}">
+            ${apiSearchByConcertController.unselect()}
+        </c:if>
+
+        <!-- Set 'selected' to null in apiSearchByConcertController when the user refreshes / reloads this Jakarta Faces page -->
+        <f:metadata>
+            <f:viewAction action="#{apiSearchByConcertController.unselect()}" rendered="#{facesContext.postback}" />
+        </f:metadata>
+
+        <div align="center">
+            <h:form id="ConcertListForm">
+                <p:panel header="#{bundle.ListConcerts}">
+                    <p:dataTable id="datalist"
+                                 value="#{apiSearchByConcertController.foundConcerts}"
+                                 var="aConcert"
+                                 widgetVar="concertsDataTable"
+                                 selectionMode="single"
+                                 selection="#{apiSearchByConcertController.selected}"
+                                 reflow="true"
+                                 showGridlines="true"
+                                 paginator="true"
+                                 rowKey="#{aConcert.event_id}"
+                                 rows="5"
+                                 rowsPerPageTemplate="5,10,20,30,50,70,90"
+                                 emptyMessage="#{bundle.NoConcertFound}!" >
+
+                        <p:ajax event="rowSelect"   update="mapButton directionsButton addButton"/>
+                        <p:ajax event="rowUnselect" update="mapButton directionsButton addButton"/>
+
+                        <!--
+                        *************************
+                        *   Data Table Header   *
+                        *************************
+                        -->
+                        <f:facet name="header">
+                            <div align="center">
+                                <p:inputText id="globalFilter" onkeyup="PF('concertsDataTable').filter()"
+                                             filterMatchMode="contains"
+                                             style="width: 250px"
+                                             placeholder="#{bundle.GlobalSearchQuery}"/>
+                                &nbsp;
+                                <p:commandButton type="button" value="#{bundle.ClearAllFilters}" styleClass="ui-button-outlined"
+                                                 icon="fas fa-undo" onclick="PF('concertsDataTable').clearFilters()"/>
+                            </div>
+                        </f:facet>
+
+                        <!--
+                        ********************************
+                        *       Event Photo      *
+                        ********************************
+                        -->
+                        <p:column headerText="#{bundle.EventPhoto}" style="width:100px; text-align: center; vertical-align: top">
+                            <h:graphicImage value="#{aConcert.imageUrl}" class="scalableImage"/>
+                        </p:column>
+
+                        <!--
+                        ********************
+                        *   Event Name   *
+                        ********************
+                        -->
+                        <p:column headerText="#{bundle.EventName}" sortBy="#{aConcert.event_name}"
+                                  filterBy="#{aConcert.event_name}" filterMatchMode="contains"
+                                  style="vertical-align: top">
+                            <h:outputText value="#{aConcert.event_name}"/>
+                        </p:column>
+
+                        <!--
+                        ********************
+                        *   Artist Name   *
+                        ********************
+                        -->
+                        <p:column headerText="#{bundle.ArtistName}" sortBy="#{aConcert.artist_name}"
+                                  filterBy="#{aConcert.artist_name}" filterMatchMode="contains"
+                                  style="vertical-align: top">
+                            <h:outputText value="#{aConcert.artist_name}"/>
+                        </p:column>
+
+                        <!--
+                        ********************
+                        *   Event Date   *
+                        ********************
+                        -->
+                        <p:column headerText="#{bundle.EventDate}" sortBy="#{aConcert.formattedStartDate}"
+                                  filterBy="#{aConcert.formattedStartDate}" filterMatchMode="contains"
+                                  style="width: 100px; text-align: center; vertical-align: top">
+                            <h:outputText value="#{aConcert.formattedStartDate}"/>
+                        </p:column>
+
+                        <!--
+                        ***********************
+                        *   Venue Name        *
+                        ***********************
+                        -->
+                        <p:column headerText="#{bundle.VenueName}" sortBy="#{aConcert.venue_name}"
+                                  filterBy="#{aConcert.venue_name}" filterMatchMode="contains"
+                                  style="vertical-align: top">
+                            <h:outputText value="#{aConcert.venue_name}"/>
+                        </p:column>
+
+                        <!--
+                        ***************************
+                        *   Venue City and State  *
+                        ***************************
+                        -->
+                        <p:column headerText="#{bundle.VenueLocation}" sortBy="#{aConcert.venue_city}"
+                                  filterBy="#{aConcert.venue_city}" filterMatchMode="contains"
+                                  style="vertical-align: top">
+                            <h:outputText value="#{aConcert.venue_city}, #{aConcert.venue_state}"/>
+                        </p:column>
+
+                        <!--
+                        ***********************
+                        *   Event URL (Link)  *
+                        ***********************
+                        -->
+                        <p:column headerText="#{bundle.TicketLink}" style="vertical-align: top;">
+                            <h:outputLink value="#{aConcert.event_url}" target="_blank">
+                                <h:outputText value="View on Ticketmaster" />
+                            </h:outputLink>
+                        </p:column>
+
+                        <!--
+                        ***********************
+                        *   Description       *
+                        ***********************
+                        -->
+                        <p:column headerText="#{bundle.EventDescription}" style="vertical-align: top; width: 300px;">
+                            <h:outputText value="#{aConcert.description}" />
+                        </p:column>
+
+                        <!--
+                        *************************
+                        *   Data Table Footer   *
+                        *************************
+                        -->
+                        <f:facet name="footer">
+                            <div align="center">
+                                <p:button value="#{bundle.Back}" icon="fas fa-arrow-left" styleClass="ui-button-outlined"
+                                          outcome="#{apiSearchByConcertController.returnUrl}"
+                                          rendered="#{not empty apiSearchByConcertController.returnUrl}" />
+                                &nbsp;
+                                <!-- MAP button: id is used since it is referenced to be activated or deactivated -->
+                                <p:commandButton id="mapButton" value="#{bundle.LocationOnMap}" icon="far fa-map" styleClass="rounded-button"
+                                                 update=":MapViewDlg" oncomplete="PF('MapViewDialog').show()"
+                                                 disabled="#{empty apiSearchByConcertController.selected}"/>
+                                &nbsp;
+                                <!-- Directions button: id is used since it is referenced to be activated or deactivated -->
+                                <p:button id="directionsButton" outcome="/search/Directions" value="#{bundle.Directions}"
+                                          icon="fas fa-directions" styleClass="rounded-button"
+                                          disabled="#{empty apiSearchByConcertController.selected}"/>
+                                &nbsp;
+                                <!-- ***************************************************
+                                    Display a Confirmation dialog for the SHARE button
+                                    id is used since it is referenced to be activated or not
+                                    **************************************************** -->
+                                <p:commandButton id="addButton" value="#{bundle.AddToUserConcerts}" icon="fas fa-plus" styleClass="rounded-button"
+                                                 actionListener="#{apiSearchByConcertController.shareToUserConcerts()}"
+                                                 update="datalist,:growlInfoMessage,:growlWarningMessage,:growlErrorMessage,:growlFatalMessage"
+                                                 disabled="#{empty apiSearchByConcertController.selected}">
+
+                                    <p:confirm header="#{bundle.AddConfirmation}"
+                                               message="#{bundle.AddConfirmationConcertDialog}"/>
+                                </p:commandButton>
+
+                                <p:confirmDialog id="shareConfirmDialogBox" global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                                    <div align="center">
+                                        <p:commandButton value="#{bundle.No}" type="button" styleClass="ui-confirmdialog-no" icon="fas fa-window-close" />
+                                        &nbsp;
+                                        <p:commandButton value="#{bundle.Yes}" type="button" class="ui-confirmdialog-yes ui-button-danger" icon="fas fa-check-square" />
+                                    </div>
+                                </p:confirmDialog>
+                                <!-- *******************************************
+                                End of Display of the SHARE Confirmation dialog
+                                ******************************************** -->
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </div>
+        <!-- Clicking the Map button displays the included Map.xhtml file in a dialog window on top of this page. -->
+        <ui:include src="/search/Map.xhtml"/>
+    </ui:define>
+</ui:composition>
+</html>

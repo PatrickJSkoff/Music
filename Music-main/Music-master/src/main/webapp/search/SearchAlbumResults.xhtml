@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core">
+
+<ui:composition template="/template/siteTemplate.xhtml">
+    <ui:define name="title">
+        <h:outputText value="#{bundle.SongsFound}" />
+    </ui:define>
+
+    <ui:define name="editableContent">
+        <c:if test="#{facesContext.validationFailed}">
+            ${apiSearchByAlbumNameController.unselect()}
+        </c:if>
+
+        <f:metadata>
+            <f:viewAction action="#{apiSearchByAlbumNameController.unselect()}" rendered="#{facesContext.postback}" />
+        </f:metadata>
+
+        <div align="center">
+            <h:form id="SongListForm">
+                <p:panel header="#{apiSearchByAlbumNameController.formattedAlbumHeader}">
+                    <p:dataTable id="datalist"
+                                 value="#{apiSearchByAlbumNameController.foundSongs}"
+                                 var="aSong"
+                                 widgetVar="songsDataTable"
+                                 selectionMode="single"
+                                 selection="#{apiSearchByAlbumNameController.selected}"
+                                 reflow="true"
+                                 showGridlines="true"
+                                 paginator="true"
+                                 rowKey="#{aSong.spotify_id}"
+                                 rows="5"
+                                 rowsPerPageTemplate="5,10,20,30,50,70,90"
+                                 emptyMessage="#{bundle.NoSongFound}!" >
+
+                        <p:ajax event="rowSelect" update="playButton addButton"/>
+                        <p:ajax event="rowUnselect" update="playButton addButton"/>
+
+                        <f:facet name="header">
+                            <div align="center">
+                                <p:inputText id="globalFilter" onkeyup="PF('songsDataTable').filter()"
+                                             filterMatchMode="contains"
+                                             style="width: 250px"
+                                             placeholder="Enter Global Search Query"/>
+                                &nbsp;
+                                <p:commandButton type="button" value="Clear All Filters" styleClass="ui-button-outlined"
+                                                 icon="fas fa-undo" onclick="PF('songsDataTable').clearFilters()"/>
+                            </div>
+                        </f:facet>
+
+                        <p:column headerText="#{bundle.AlbumArtwork}" style="width:100px; text-align: center; vertical-align: top">
+                            <h:graphicImage value="#{aSong.album_artwork_url}" class="scalableImage"/>
+                        </p:column>
+
+                        <p:column headerText="#{bundle.SongName}" sortBy="#{aSong.name}"
+                                  filterBy="#{aSong.name}" filterMatchMode="contains"
+                                  style="vertical-align: top">
+                            <h:outputText value="#{aSong.nameExplicit}"/>
+                        </p:column>
+
+                        <p:column headerText="#{bundle.ArtistName}" sortBy="#{aSong.artist_name}"
+                                  filterBy="#{aSong.artist_name}" filterMatchMode="contains"
+                                  style="vertical-align: top">
+                            <h:outputText value="#{aSong.artist_name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{bundle.AlbumName}" sortBy="#{aSong.album_name}"
+                                  filterBy="#{aSong.album_name}" filterMatchMode="contains"
+                                  style="vertical-align: top">
+                            <h:outputText value="#{aSong.album_name}"/>
+                        </p:column>
+
+                        <p:column headerText="#{bundle.Duration}" sortBy="#{aSong.duration}"
+                                  style="width:90px; text-align: center; vertical-align: top">
+                            <h:outputText value="#{aSong.duration}"/>
+                        </p:column>
+
+                        <p:column headerText="#{bundle.ReleaseDate}" sortBy="#{aSong.release_date}"
+                                  filterBy="#{aSong.release_date}" filterMatchMode="contains"
+                                  style="width: 100px; text-align: center; vertical-align: top">
+                            <h:outputText value="#{aSong.getFormattedReleaseDate()}" />
+                        </p:column>
+
+                        <f:facet name="footer">
+                            <div align="center">
+                                &nbsp;
+                                <p:button value="#{bundle.Back}" icon="fas fa-arrow-left" styleClass="ui-button-outlined"
+                                          outcome="#{apiSearchByAlbumNameController.returnUrl}"
+                                          rendered="#{not empty apiSearchByAlbumNameController.returnUrl}" />
+                                &nbsp;
+                                <p:commandButton id="playButton" value="#{bundle.Play}" icon="fas fa-play" styleClass="rounded-button"
+                                                 update=":VideoApiPlayForm" oncomplete="PF('VideoApiPlayDialog').show()"
+                                                 disabled="#{empty apiSearchByAlbumNameController.selected}" />
+                                &nbsp;
+                                <p:commandButton id="addButton" value="#{bundle.AddToUserSongs}" icon="fas fa-plus" styleClass="rounded-button"
+                                                 actionListener="#{apiSearchByAlbumNameController.shareToUserSongs()}"
+                                                 update="datalist,:growlInfoMessage,:growlWarningMessage,:growlErrorMessage,:growlFatalMessage"
+                                                 disabled="#{empty apiSearchByAlbumNameController.selected}">
+                                    <p:confirm header="#{bundle.AddConfirm}"
+                                               message="#{bundle.AddToUserSongsConfirm}"/>
+                                </p:commandButton>
+
+                                &nbsp;
+                                <p:commandButton id="graphButton" value="#{bundle.ViewPopularity}" icon="fas fa-chart-bar" styleClass="rounded-button"
+                                                 update=":albumGraphForm" oncomplete="PF('albumGraphDialog').show()"
+                                                 disabled="#{empty apiSearchByAlbumNameController.foundSongs}" />
+
+                                <p:confirmDialog id="shareConfirmDialogBox" global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                                    <div align="center">
+                                        <p:commandButton value="#{bundle.No}" type="button" styleClass="ui-confirmdialog-no" icon="fas fa-window-close" />
+                                        &nbsp;
+                                        <p:commandButton value="#{bundle.Yes}" type="button" class="ui-confirmdialog-yes ui-button-danger" icon="fas fa-check-square" />
+                                    </div>
+                                </p:confirmDialog>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:panel>
+
+                <!-- Chart Initialization Components -->
+                <p:remoteCommand name="initAlbumChart"
+                                 action="#{apiSearchByAlbumNameController.createAlbumPopularityChart()}"
+                                 update=":albumGraphForm:albumChartComponent" />
+
+                <h:outputScript>
+                    function destroyAlbumChart() {
+                    if (PF('albumChartComponent')) {
+                    PF('albumChartComponent').destroy();
+                    }
+                    }
+                </h:outputScript>
+            </h:form>
+        </div>
+
+        <!-- YouTube Player Dialog -->
+        <ui:include src="/search/YouTubePlayerAlbum.xhtml"/>
+
+        <!-- Updated Album Graph Dialog -->
+        <p:dialog header="Album Song Popularity" widgetVar="albumGraphDialog" modal="true"
+                  resizable="true" width="800" height="650" showEffect="fade" hideEffect="fade"
+                  closable="true" closeOnEscape="true"
+                  onShow="initAlbumChart()" onHide="destroyAlbumChart()">
+            <ui:include src="/search/AlbumGraph.xhtml"/>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+</html>

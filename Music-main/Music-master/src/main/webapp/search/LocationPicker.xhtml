@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core">
+
+<ui:composition>
+    <p:dialog id="LocationPickerDlg" header="#{bundle.PickLocation}"
+              widgetVar="LocationPickerDialog" modal="true" position="center" appendTo="@(body)"
+              showEffect="slide" hideEffect="fade" responsive="true">
+
+        <h:form id="LocationPickerForm">
+            <div align="center">
+                <p:gmap id="pickMap"
+                        center="#{apiSearchByConcertController.mapCenter}"
+                        zoom="5"
+                        type="roadmap"
+                        model="#{apiSearchByConcertController.pickLocationMapModel}"
+                        style="width:600px;height:400px"
+                        widgetVar="pickMapWidget"
+                        draggable="true">
+
+                    <!-- Capture click to select location -->
+                    <p:ajax event="pointSelect"
+                            listener="#{apiSearchByConcertController.onPointSelect}"
+                            update="LocationPickerForm:latField LocationPickerForm:lngField LocationPickerForm:pickMap" />
+                </p:gmap>
+
+                <br/>
+
+                <p:outputLabel value="#{bundle.Latitude}:" />
+                <p:inputText id="latField" value="#{apiSearchByConcertController.selectedLatitude}" readonly="true" />
+
+                <p:outputLabel value="#{bundle.Longitude}:" />
+                <p:inputText id="lngField" value="#{apiSearchByConcertController.selectedLongitude}" readonly="true" />
+
+                <br/><br/>
+
+                <p:commandButton value="#{bundle.Close}" icon="fas fa-window-close" onclick="PF('LocationPickerDialog').hide()" />
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>

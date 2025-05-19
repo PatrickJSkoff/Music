@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:composition>
+        <!-- 
+        =================================================================
+        |  Clicking the EDIT button in DataTable.xhtml displays this Dialog  |
+        |  window for the user to update the selected park visit's data.   |
+        =================================================================
+        -->
+        <p:dialog id="PlaylistEditDlg" header="#{bundle.Edit} #{playlistController.selected.name}" widgetVar="PlaylistEditDialog"
+                  modal="true" position="center" appendTo="@(body)" width="80%" height="400"
+                  showEffect="slide" hideEffect="fade" responsive="true" onHide="clearUserSongSelection()">
+            <!--
+            Various effect options can be used when showing and closing the dialog.
+            Use showEffect and hideEffect options to apply these effects:
+                blind, bounce, clip, drop, explode, fade, fold, highlight, puff,
+                pulsate, scale, shake, size, slide and transfer. [PrimeFaces Documentation]
+            -->
+            <!-- class="ui-datatable-data" in siteStyles reduces row paddings -->
+            <h:form id="PlaylistEditForm" class="ui-datatable-data">
+                <h:panelGroup id="display">
+                    <table border="0" align="center" cellpadding="5" cellspacing="0">
+                        <tbody>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <p:outputLabel value="#{bundle.PlaylistName}:" for="name"/>
+                            </td>
+                            <td align="left" valign="middle" bgcolor="oldlace" width="100%">
+                                <p:inputText id="name" value="#{playlistController.selected.name}" style="width:100%"
+                                             required="true" requiredMessage="Playlist Name is Required!"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                <p:outputLabel value="#{bundle.PlaylistDescription}:" for="description"/>
+                            </td>
+                            <td align="left" valign="middle" bgcolor="oldlace" width="100%">
+                                <p:inputText id="description" value="#{playlistController.selected.description}" style="width:100%"
+                                             required="true" requiredMessage="Description is Required!"/>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </h:panelGroup>
+                <br />
+                <h:panelGroup>
+                    <div align="center">
+                        <!-- SAVE button -->
+                        <p:commandButton value="Save" icon="fas fa-save" styleClass="rounded-button"
+                                         ajax="false" actionListener="#{playlistController.update()}"
+                                         update="display,:PlaylistListForm:datalist,:growlInfoMessage,:growlWarningMessage,:growlErrorMessage,:growlFatalMessage"
+                                         oncomplete="handleSubmit(args, 'PlaylistEditDialog');"/>
+                        &nbsp;
+                        <!-- CANCEL button -->
+                        <p:commandButton value="Cancel" icon="fas fa-ban" styleClass="ui-button-outlined"
+                                         immediate="true" onclick="PF('PlaylistEditDialog').hide()" />
+                    </div>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:composition>
+</html>

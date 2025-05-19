@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="jakarta.tags.core"
+      xmlns:f="jakarta.faces.core">
+
+<ui:composition>
+    <!--
+    ==========================================================
+    |  Clicking the VIEW button in DataTable.xhtml displays this  |
+    |  Dialog window showing the selected user artist data.    |
+    ==========================================================
+    height="400" makes the dialog window to be vertically scrollable
+    width="60%" and responsive="true" make the dialog window horizontally responsive
+    class="scalableImage" makes the displayed image responsive
+    -->
+    <p:dialog id="UserArtistAlbumViewDlg" header="#{userArtistController.selected.name}" widgetVar="UserArtistAlbumViewDialog"
+              modal="true" position="center" appendTo="@(body)" width="70%" height="500"
+              showEffect="slide" hideEffect="fade" responsive="true" >
+        <!--
+        Various effect options can be used when showing and closing the dialog.
+        Use showEffect and hideEffect options to apply these effects:
+            blind, bounce, clip, drop, explode, fade, fold, highlight, puff,
+            pulsate, scale, shake, size, slide and transfer. [PrimeFaces Documentation]
+        -->
+        <h:form id="UserArtistAlbumViewForm" class="ui-datatable-data">
+            <div align="center">
+                <p:panel style="text-align: center; width:95%;">
+                    <h:panelGroup id="display">
+                        <c:forEach var="anAlbum" items="#{userArtistAlbumController.albumsFromSelectedArtist}">
+                            <h:graphicImage class="scalableImage" value="#{anAlbum.image_url}" style="width: 300px"/>
+                            <br/><br/>
+                            <table border="1" align="center" cellpadding="5" cellspacing="0">
+                                <tbody>
+                                <tr>
+                                    <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                        <h:outputText value="#{bundle.AlbumName}:"/>
+                                    </td>
+                                    <td align="left" valign="middle" bgcolor="oldlace">
+                                        <h:outputText value="#{anAlbum.name}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                        <h:outputText value="#{bundle.ArtistSpotifyId}:"/>
+                                    </td>
+                                    <td align="left" valign="middle"  bgcolor="oldlace">
+                                        <h:outputText value="#{anAlbum.spotify_id}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                        <h:outputText value="#{bundle.ArtistName}:"/>
+                                    </td>
+                                    <td align="left" valign="middle"  bgcolor="oldlace">
+                                        <h:outputText value="#{anAlbum.artists}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="right" valign="middle" nowrap="nowrap" bgcolor="papayawhip">
+                                        <h:outputText value="#{bundle.ReleaseDate}:"/>
+                                    </td>
+                                    <td align="left" valign="middle"  bgcolor="oldlace">
+                                        <h:outputText value="#{anAlbum.release_date}"/>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <br/><br/>
+                        </c:forEach>
+                    </h:panelGroup>
+                    <br />
+                    <h:panelGroup>
+                        <!-- CLOSE button -->
+                        <p:commandButton value="#{bundle.Close}" icon="fas fa-window-close" styleClass="ui-button-outlined"
+                                         onclick="PF('UserArtistAlbumViewDialog').hide()" />
+                    </h:panelGroup>
+                </p:panel>
+            </div>
+        </h:form>
+    </p:dialog>
+</ui:composition>
+</html>
