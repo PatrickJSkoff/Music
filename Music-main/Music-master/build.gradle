@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group 'edu.vt'
+version '1.0'
+
+repositories {
+    // Default Maven Central repository
+    mavenCentral()
+
+    // flat filesystem directory containing the JAR files
+    flatDir {
+        // For Mac or Linux
+        // dirs 'C:/Users/Alex/IdeaProjects/Music/src/main/webapp/WEB-INF/lib'
+
+        // For Windows (Do not use double back slashes)
+        dirs 'C:/Users/****/IdeaProjects/Music/src/main/webapp/WEB-INF/lib'
+    }
+}
+
+dependencies {
+    implementation 'ch.hsr:geohash:1.4.0'
+
+    // Jakarta EE 11 dependency
+    compileOnly group: 'jakarta.platform', name: 'jakarta.jakartaee-api', version: '11.0.0-M3'
+
+    // primefaces-14.0.4.jar is located in the flat filesystem directory defined above
+    // primefaces-14.0.4.jar provides UI components for Jakarta Faces
+    compileOnly group: 'org.primefaces', name: 'primefaces', version: '15.0.0-jakarta'
+
+    /*
+     imgscalr-lib-4.2.jar is located in the flat filesystem directory defined above.
+     imgscalr-lib-4.2.jar is a simple and efficient best practice image-scaling and
+     manipulation library implemented in pure Java.
+     */
+    compileOnly group: 'org.imgscalr', name: 'imgscalr-lib', version: '4.2'
+
+    // MySQL Connector/J is a driver that allows client applications written in Java
+    // to connect to MySQL servers. It is configured in WildFly.
+    compileOnly group: 'mysql', name: 'mysql-connector-j', version: '9.2.0'
+
+    // chartjs-java-model-2.3.1.jar is located in the flat filesystem directory defined above
+    // Chart JS Java model enables the creation of many kinds of charts
+    compileOnly group: 'software.xdev', name: 'chartjs-java-model', version: '2.3.1'
+}
+
+/*
+ compileOnly     — for dependencies that are necessary to compile your production code
+                   but should not be part of the runtime classpath
+ implementation  — used for compilation and runtime
+ runtimeOnly     — only used at runtime, not for compilation
+ */
